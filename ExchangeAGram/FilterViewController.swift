@@ -177,6 +177,8 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
         let thumbNailData = UIImageJPEGRepresentation(filterImage, 0.1)
         self.thisFeedItem.thumbNail = thumbNailData
         self.thisFeedItem.caption = caption
+        self.thisFeedItem.filtered = true
+        
         
         (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
         
@@ -207,7 +209,7 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     func cacheImage(imageNumber: Int) {
         
-        let fileName = "\(imageNumber)"
+        let fileName = "\(thisFeedItem.uniqueID)\(imageNumber)"
         let uniquePath = tmp.stringByAppendingPathComponent(fileName)
         if !NSFileManager.defaultManager().fileExistsAtPath(fileName) {
             
@@ -220,17 +222,19 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
     }
     
     func getCachedImage (imageNumber: Int) -> UIImage {
-        let fileName = "\(imageNumber)"
+        let fileName = "\(thisFeedItem.uniqueID)\(imageNumber)"
         let uniquePath = tmp.stringByAppendingPathComponent(fileName)
         
         var image:UIImage
         
         if NSFileManager.defaultManager().fileExistsAtPath(uniquePath) {
-            image = UIImage(contentsOfFile: uniquePath)!
+            var returnedImage = UIImage(contentsOfFile: uniquePath)!
+            image = UIImage(CGImage: returnedImage.CGImage, scale: 1.0, orientation: UIImageOrientation.Right)!
         }
         else {
             self.cacheImage(imageNumber)
-            image = UIImage(contentsOfFile: uniquePath)!
+            var returnedImage = UIImage(contentsOfFile: uniquePath)!
+            image = UIImage(CGImage: returnedImage.CGImage, scale: 1.0, orientation: UIImageOrientation.Right)!
         }
         return image
         
